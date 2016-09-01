@@ -1,0 +1,45 @@
+html,
+body {
+    font-family: "Segoe UI", "Microsoft YaHei";
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: "Segoe UI", "Microsoft YaHei" !important;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: #5bc0de;
+}
+
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+    vertical-align: middle;
+}
+
+.border-container {
+    background-color: #fff;
+    border-color: #ddd;
+    border-width: 1px;
+    border-radius: 4px 4px 0 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.resized-img {
+    max-width: 100px;
+}
+
+.td-error {
+    color: orange;
+}
+
+.td-supererror {
+    color: red;
+}

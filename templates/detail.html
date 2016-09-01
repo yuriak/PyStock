@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detail</title>
+
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+
+    <link rel="stylesheet" href="../static/bootstrap-theme.min.css">
+
+    <script src="../static/jquery.min.js"></script>
+
+    <script src="../static/bootstrap.min.js"></script>
+    <script src="../static/common.js"></script>
+    <link href="../static/stock.css" rel="stylesheet">
+    <link href="../static/dashboard.css" rel="stylesheet">
+    <script src="../static/echarts.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" onclick="window.history.back(-1);"><</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="text-center">{{name.decode('utf-8')}}</h1>
+                    <h2 class="text-center">{{id}}</h2>
+                </div>
+            </div>
+            <br/>
+            <div class="row text-center center-block">
+                <div class="col-lg-12" id="stock" style="height: 30rem">
+                </div>
+            </div>
+            <br/>
+            <div class="row text-center center-block">
+                <div class="col-lg-12" id="score" style="height: 30rem">
+                </div>
+            </div>
+            <br/>
+            <div class="row text-center center-block">
+                <div class="col-lg-12" id="rank" style="height: 30rem">
+                </div>
+            </div>
+            <br/>
+            <div class="row text-center center-block">
+                <div class="col-lg-12" id="nscore" style="height: 30rem">
+                </div>
+            </div>
+            <br/>
+            <div class="row text-center center-block">
+                <div class="col-lg-12" id="nrank" style="height: 30rem">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+<script type="text/javascript">
+    var stockChart = echarts.init(document.getElementById('stock'));
+    var scoreChart = echarts.init(document.getElementById('score'));
+    var rankChart = echarts.init(document.getElementById('rank'));
+    var nscoreChart = echarts.init(document.getElementById('nscore'));
+    var nrankChart = echarts.init(document.getElementById('nrank'));
+    $.get('/getStockData/{{id}}', function (data) {
+        priceData = Array();
+        scoreData = Array();
+        adviceData = Array();
+        data = JSON.parse(data);
+        for (i = 0; i < data.length; i++) {
+            priceData.push({
+                name: Date.parse(data[i].stockdate).toString()
+                , value: [data[i].stockdate, data[i].stockprice]
+            });
+            scoreData.push({
+                name: Date.parse(data[i].stockdate).toString()
+                , value: [data[i].stockdate, data[i].stockscore]
+            });
+            adviceData.push({
+                name: Date.parse(data[i].stockdate).toString()
+                , value: [data[i].stockdate, data[i].stockadvice]
+            });
+        }
+        stockChart.setOption(option = {
+            title: {
+                text: 'info chart',
+                padding: [30, 30, 30, 0]
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['price', 'score', 'advice']
+            },
+            toolbox: {},
+            xAxis: {
+                type: 'time',
+                boundaryGap: false,
+            },
+            yAxis: {
+                type: 'value'
+            },
+            dataZoom: [
+                {
+                    show: true,
+                    realtime: true,
+                    start: 50,
+                    end: 100
+                },
+                {
+                    type: 'inside',
+                    realtime: true,
+                    start: 50,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: 'price',
+                    type: 'line',
+                    showSymbol: false,
+                    hoverAnimation: false,
+                    data: priceData
+                },
+                {
+                    name: 'score',
+                    type: 'line',
+                    showSymbol: false,
+                    hoverAnimation: false,
+                    data: scoreData
+                },
+                {
+                    name: 'advice',
+                    type: 'line',
+                    showSymbol: false,
+                    hoverAnimation: false,
+                    data: adviceData
+                }
+            ]
+        });
+    });
+    $.get('/getResultData/{{id}}', function (data) {
+        resultData = Array();
+        rankData = Array();
+        data = JSON.parse(data);
+        console.log(data);
+        for (i = 0; i < data.length; i++) {
+            resultData.push({
+                name: Date.parse(data[i][1]).toString()
+                , value: [data[i][1], data[i][0]]
+            });
+            rankData.push({
+                name: Date.parse(data[i][1]).toString()
+                , value: [data[i][1], data[i][2]]
+            });
+        }
+        scoreChart.setOption(option = {
+            title: {
+                text: 'score chart',
+                padding: [30, 30, 30, 0],
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['score']
+            },
+            toolbox: {},
+            xAxis: {
+                type: 'time',
+                boundaryGap: false,
+            },
+            yAxis: {
+                type: 'value'
+            },
+            dataZoom: [
+                {
+                    show: true,
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'inside',
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: 'score',
+                    type: 'line',
+                    showSymbol: false,
+                    data: resultData
+                },
+            ]
+        });
+        rankChart.setOption(option = {
+            title: {
+                text: 'rank chart',
+                padding: [30, 30, 30, 0],
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['rank']
+            },
+            toolbox: {},
+            xAxis: {
+                type: 'time',
+                boundaryGap: false,
+            },
+            yAxis: {
+                type: 'value'
+            },
+            dataZoom: [
+                {
+                    show: true,
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'inside',
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: 'rank',
+                    type: 'line',
+                    data: rankData
+                },
+            ]
+        });
+    });
+    $.get('/getNResultData/{{id}}', function (data) {
+        resultData = Array();
+        rankData = Array();
+        data = JSON.parse(data);
+        console.log(data);
+        for (i = 0; i < data.length; i++) {
+            resultData.push({
+                name: Date.parse(data[i][1]).toString()
+                , value: [data[i][1], data[i][0]]
+            });
+            rankData.push({
+                name: Date.parse(data[i][1]).toString()
+                , value: [data[i][1], data[i][2]]
+            });
+        }
+        nscoreChart.setOption(option = {
+            title: {
+                text: 'normal score chart',
+                padding: [30, 30, 30, 0],
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['score']
+            },
+            toolbox: {},
+            xAxis: {
+                type: 'time',
+                boundaryGap: false,
+            },
+            yAxis: {
+                type: 'value'
+            },
+            dataZoom: [
+                {
+                    show: true,
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'inside',
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: 'score',
+                    type: 'line',
+                    showSymbol: false,
+                    data: resultData
+                },
+            ]
+        });
+        nrankChart.setOption(option = {
+            title: {
+                text: 'normal rank chart',
+                padding: [30, 30, 30, 0],
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['rank']
+            },
+            toolbox: {},
+            xAxis: {
+                type: 'time',
+                boundaryGap: false,
+            },
+            yAxis: {
+                type: 'value'
+            },
+            dataZoom: [
+                {
+                    show: true,
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'inside',
+                    realtime: true,
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: 'rank',
+                    type: 'line',
+                    data: rankData
+                },
+            ]
+        });
+    });
+</script>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Login</title>
+
+		<link rel="stylesheet" href="../static/bootstrap.min.css">
+
+		<link rel="stylesheet" href="../static/bootstrap-theme.min.css">
+
+		<script src="../static/jquery.min.js"></script>
+
+		<script src="../static/bootstrap.min.js"></script>
+		<script src="../static/common.js"></script>
+		<link href="../static/stock.css" rel="stylesheet">
+		<link href="../static/signin.css" rel="stylesheet">
+	</head>
+	<body style="background-color: black;">
+		<div class="container">
+			<form action="/login" method="post">
+				<div id="loginForm" class="form-signin">
+				<h2 class="form-signin-heading text-center" style="color: white;">Hello </h2>
+				<label for="username" class="sr-only">Password</label>
+				<input name="username" type="text" id="username" class="form-control" placeholder="username" required>
+				<label for="password" class="sr-only">Password</label>
+				<input name="password" type="password" id="password" class="form-control" placeholder="password" onkeydown="enterInput(event)" required>
+				<br />
+				<button type="submit" id="submit" class="btn btn-lg btn-success btn-block">Login</button>
+			</div>
+			</form>
+			
+		</div>
+		<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="deleteContestModal" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="exampleModalLabel">错误</h4>
+					</div>
+					<div class="modal-body">
+						<h4 id="reason"></h4>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /container -->
+		<script src="../static/ie10-viewport-bug-workaround.js"></script>
+	</body>
+</html>
+<script language="JavaScript">
+	var error={{request.args.get('error','-1')}};
+	if(error==0){
+		showErrMsg('用户名或密码错误');
+	}
+</script>

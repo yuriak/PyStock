@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Normal Rank</title>
+
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+
+    <link rel="stylesheet" href="../static/bootstrap-theme.min.css">
+
+    <script src="../static/jquery.min.js"></script>
+
+    <script src="../static/bootstrap.min.js"></script>
+    <script src="../static/common.js"></script>
+    <script type="text/javascript" src="../static/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="../static/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <link href="../static/stock.css" rel="stylesheet">
+    <link href="../static/signin.css" rel="stylesheet">
+    <link href="../static/dashboard.css" rel="stylesheet">
+    <link href="../static/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+</head>
+<body style="background-color: white">
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/rank" >Advanced Rank</a>
+                </li>
+                <li class="active">
+                    <a href="/nrank" >Normal Rank</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="text-center">{{date}}</h1>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4 input-group date form_date" data-date-format="yyyy-mm-dd">
+                    <input class="form-control " name="stockDate" id="stockDate" placeholder="date" type="text"
+                           readonly="readonly" value="{{date}}"/>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                </div>
+                <input type="hidden" id="dtp_input2" value=""/><br/>
+                
+                <div class="col-md-4">
+                </div>
+            </div>
+            <div class="row">
+            	<div class="col-md-4"></div>
+            	<div class="col-md-4">
+            		<button type="button" class="btn btn-block btn-primary" id="query">Query</button>
+            	</div>
+            	<div class="col-md-4"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>StockID</th>
+                                <th>StockName</th>
+                                <th>Score</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {%for r in result%}
+                            <tr onclick="window.location.href='/detail/{{r.stockid}}';">
+                                <td><b>{{loop.index}}</b></td>
+                                <td><b>{{r.stockid}}</b></td>
+                                <td><b>{{r.stockname.decode('utf-8')}}</b></td>
+                                <td><b>{{r.stockscore}}</b></td>
+                            </tr>
+                            {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script language="JavaScript">
+    $('.form_date').datetimepicker({
+        language: 'zh-CN',
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        format: 'yyyy-mm-dd'
+    });
+    $('#query').click(function(){
+    	date=$('#stockDate').val();
+    	if(isNullOrEmpty(date)){
+    		showErrMsg('Please choose correct date');
+    	}else{
+    		location.href="/nrank?date="+date
+    	}
+    });
+</script>
