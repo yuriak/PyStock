@@ -137,6 +137,9 @@ def dict2object(d):
 		inst = d
 	return inst
 
+def start_server(port=5000):
+	app.secret_key = '8e88c0bdba3ea10c5cec4112fc7a1494'
+	app.run(host='0.0.0.0', debug=True, threaded=True)
 
 if __name__ == '__main__':
 	app.secret_key = '8e88c0bdba3ea10c5cec4112fc7a1494'
