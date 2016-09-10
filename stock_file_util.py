@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import codecs
 import datetime
+import json
 
 from stock import Stock
 import os
@@ -248,11 +249,11 @@ def readStockRankFromDateDataDir(filepath):
 		stockList = []
 		for line in lines:
 			stockList.append(Stock.parse(line.strip()))
-		stockList.sort(key=lambda x: x.stockscore,reverse=True)
-		rank=1
+		stockList.sort(key=lambda x: x.stockscore, reverse=True)
+		rank = 1
 		for stock in stockList:
-			stockrank[dateIndex][stock.stockid]=(stock.stockid,stock.stockscore,resultDate,rank)
-			rank+=1
+			stockrank[dateIndex][stock.stockid] = (stock.stockid, stock.stockscore, resultDate, rank)
+			rank += 1
 		dateIndex += 1
 	return stockrank
 
@@ -357,11 +358,129 @@ def readDataFromDateDir(filepath=DATE_DATA_PATH):
 	return data
 
 
+def readWechatConfig(filepath='config/config.json'):
+	if not os.path.exists(filepath):
+		return
+	f = open(filepath)
+	str = f.read()
+	return json.loads(str)
+
+
+def readOneStockData(stock, date):
+	ids = readIDAndNameFile(ID_PATH + '/id.txt')
+	queryID = None
+	queryName=None
+	arank = 0
+	ascore = 0
+	nrank = 0
+	nscore = 0
+	price = 0
+	advice = 0
+	currdt = date
+	if stock in ids.keys():
+		queryID = stock
+		queryName=ids[stock]
+	elif stock in ids.values():
+		for k, v in ids.items():
+			if v == stock:
+				queryID = k
+				queryName=v
+	else:
+		return None
+	if queryID == None:
+		return None
+	else:
+		if not os.path.exists(RESULT_PATH + '/' + date + '.txt'):
+			currdt = sorted(os.listdir(RESULT_PATH))[-1].split('.')[0]
+		f = open(RESULT_PATH + '/' + currdt + '.txt')
+		aList = []
+		nList = []
+		for line in f.readlines():
+			id = line.split(',')[0]
+			if line.split(',')[1] == 'nan': continue
+			ascore = float(line.split(',')[1])
+			aList.append((id, ascore))
+		aList.sort(key=lambda x: x[1], reverse=True)
+		result = [(aList.index(x), x[1]) for x in aList if x[0] == queryID]
+		if len(result) != 0:
+			arank = result[0][0] * 100.0 / len(aList)
+			ascore = result[0][1]
+		f.close()
+		currdt = date
+		if not os.path.exists(DATE_DATA_PATH + '/' + date + '.txt'):
+			currdt = sorted(os.listdir(DATE_DATA_PATH))[-1].split('.')[0]
+		f = open(DATE_DATA_PATH + '/' + currdt + '.txt')
+		for line in f.readlines():
+			nList.append(Stock.parse(line))
+		nList.sort(key=lambda x: x.stockscore, reverse=True)
+		result = [(nList.index(stock), stock) for stock in nList if stock.stockid == queryID]
+		if len(result) != 0:
+			nrank = result[0][0] * 100.0 / len(nList)
+			nscore = result[0][1].stockscore
+			advice = Stock.parseAdvice(int(result[0][1].stockadvice))
+			price = result[0][1].stockprice
+		return (queryID,queryName,arank, ascore, nrank, nscore, advice, price, currdt)
+
+
+def readTodayList(date):
+	ids = readIDAndNameFile(ID_PATH + '/id.txt')
+	arank = 0
+	ascore = 0
+	nrank = 0
+	nscore = 0
+	price = 0
+	advice = 0
+	currdt = date
+	if not os.path.exists(RESULT_PATH + '/' + date + '.txt'):
+		currdt = sorted(os.listdir(RESULT_PATH))[-1].split('.')[0]
+	f = open(RESULT_PATH + '/' + currdt + '.txt')
+	aList = []
+	nList = []
+	for line in f.readlines():
+		id = line.split(',')[0]
+		if line.split(',')[1].strip() == 'nan': continue
+		ascore = float(line.split(',')[1])
+		aList.append((id, ascore))
+	aList.sort(key=lambda x: x[1], reverse=True)
+	f.close()
+	currdt = date
+	if not os.path.exists(DATE_DATA_PATH + '/' + date + '.txt'):
+		currdt = sorted(os.listdir(DATE_DATA_PATH))[-1].split('.')[0]
+	f = open(DATE_DATA_PATH + '/' + currdt + '.txt')
+	for line in f.readlines():
+		nList.append(Stock.parse(line))
+	nList.sort(key=lambda x: x.stockscore, reverse=True)
+	ar=[]
+	for a in aList[0:5]:
+		price=0.0
+		advice=''
+		for stock in nList:
+			if stock.stockid==a[0]:
+				price=stock.stockprice
+				advice=Stock.parseAdvice(stock.stockadvice)
+		ar.append((a[0],ids[a[0]],a[1],price,advice,currdt))
+
+	# ar = [(a[0], ids[a[0]], a[1], [stock.stockprice for stock in nList if stock.stockid == a[0]][0], [Stock.parseAdvice(stock.stockadvice) for stock in nList if stock.stockid == a[0]][0], currdt) for a in aList[0:10]]
+	nr = [(stock.stockid, stock.stockname, stock.stockscore, stock.stockprice, Stock.parseAdvice(stock.stockadvice), currdt) for stock in nList[0:5]]
+	return ar, nr
+
+
 if __name__ == '__main__':
+	# print (datetime.date.today()+datetime.timedelta(-1)).strftime('%Y-%m-%d')
 	# rewriteDataDate()
 	# print readStockRankFromDir('result')
 	# readOneDayResult('2016-08-13')
 	# 	deleteOneDayStockData(['2016-08-15'])
 	# 	stocks=readDateStockDataFromDirs(ID_DATA_PATH)
 	# 	cleanData(stocks,'data_clean_new/')
+	# a=[('001',22), ('002', 22), ('003', 22), ('004', 22), ('005', 22)]
+	# print [a.index(x) for x in a if x[0]=='003']
+	# print readOneStockData('深科技', '2016-08-29')
+	# print readTodayList('2016-09-05')
+	# d=sorted([1,2,3,4,5,4,3,2,1])
+	# print d
+	# print os.listdir(RESULT_PATH).sort(key=lambda x:datetime.datetime.strptime(x.split('.')[0],'%Y-%m-%d'))
+	# pass
+	# print readOneStockData('000001', '2016-09-06')
+	# print readTodayList('2016-09-06')
 	pass

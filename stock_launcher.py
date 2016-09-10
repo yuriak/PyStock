@@ -20,7 +20,7 @@ if len(sys.argv) >= 2:
 	elif args[0] == 'analyzer':
 		if args[1] == 'today':
 			result = comprehensiveTest()
-			writeResultToFile(result, 'result/' + datetime.datetime.today().strftime('%Y-%m-%d'))
+			writeResultToFile(result, 'result/' + datetime.datetime.today().strftime('%Y-%m-%d')+'.txt')
 		else:
 			p = re.compile('\d{4}-\d{2}-\d{2}')
 			if p.match(args[1]) != None:

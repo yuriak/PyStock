@@ -622,7 +622,7 @@ if __name__ == '__main__':
 	# recalc()
 	# getBestStockByAverageCompScore()
 	# getAllStockID()
-	# crawlTodayStock('2016-08-29')
+	# crawlTodayStock('2016-09-06')
 	# stockDic=readStockDataFromDirs('data_clean')
 	# deleteOneDayStockData(['2015-08-25'])
 	# corrTest(stockDic)

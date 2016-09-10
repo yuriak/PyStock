@@ -119,7 +119,7 @@ def convertAdviceWord2Number(advice):
 	else:
 		return ad[advice]
 
-def fetchOneDayDataFromMyServer(url='http://115.29.143.181/stock',key='8e88c0bdba3ea10c5cec4112fc7a1494',date=datetime.date.today().strftime('%Y-%m-%d')):
+def fetchOneDayDataFromMyServer(url='http://115.29.143.181:8080/stock',key='8e88c0bdba3ea10c5cec4112fc7a1494',date=datetime.date.today().strftime('%Y-%m-%d')):
 	realUrl=url+'?key='+key+'&date='+date
 	stocks=[]
 	try:
