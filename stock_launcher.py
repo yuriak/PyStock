@@ -5,6 +5,7 @@ from stock_server import *
 import sys
 import re
 import platform
+from snownlp import *
 
 if len(sys.argv) >= 2:
 	args = sys.argv[1:]

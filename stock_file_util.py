@@ -451,6 +451,7 @@ def readTodayList(date):
 		nList.append(Stock.parse(line))
 	nList.sort(key=lambda x: x.stockscore, reverse=True)
 	ar=[]
+	nr=[]
 	for a in aList[0:5]:
 		price=0.0
 		advice=''
@@ -459,9 +460,10 @@ def readTodayList(date):
 				price=stock.stockprice
 				advice=Stock.parseAdvice(stock.stockadvice)
 		ar.append((a[0],ids[a[0]],a[1],price,advice,currdt))
-
+	for n in nList[0:5]:
+		nr.append((n.stockid,n.stockname,n.stockscore,n.stockprice,Stock.parseAdvice(n.stockadvice),currdt))
 	# ar = [(a[0], ids[a[0]], a[1], [stock.stockprice for stock in nList if stock.stockid == a[0]][0], [Stock.parseAdvice(stock.stockadvice) for stock in nList if stock.stockid == a[0]][0], currdt) for a in aList[0:10]]
-	nr = [(stock.stockid, stock.stockname, stock.stockscore, stock.stockprice, Stock.parseAdvice(stock.stockadvice), currdt) for stock in nList[0:5]]
+	# nr = [(stock.stockid, stock.stockname, stock.stockscore, stock.stockprice, Stock.parseAdvice(stock.stockadvice), currdt) for stock in nList[0:5]]
 	return ar, nr
 
 

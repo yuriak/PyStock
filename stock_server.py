@@ -23,35 +23,14 @@ CONFIG = {}
 
 @app.route('/')
 def index():
-	if 'username' in session:
-		return redirect(url_for('rank'))
-	else:
-		return redirect(url_for('login'))
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-	if request.method == 'GET':
-		error = request.args.get('error', -1)
-		return render_template('login.html', error=error)
-	else:
-		if request.form['username'] == 'pystock' and request.form['password'] == 'redstone':
-			print 'in'
-			session['username'] = 'pystock'
-			return redirect(url_for('rank'))
-		else:
-			return redirect(url_for('login', error=0))
-
+	return redirect(url_for('rank'))
 
 @app.route('/rank', methods=['GET', 'POST'])
 def rank():
 	if request.method == 'GET':
-		if 'username' in session:
-			date = request.args.get('date', datetime.datetime.today().strftime('%Y-%m-%d'))
-			result = readOneDayResult(date)
-			return render_template('rank.html', date=date, result=result)
-		else:
-			return redirect(url_for('index'))
+		date = request.args.get('date', datetime.datetime.today().strftime('%Y-%m-%d'))
+		result = readOneDayResult(date)
+		return render_template('rank.html', date=date, result=result)
 	else:
 		return redirect(url_for('index'))
 
@@ -59,13 +38,10 @@ def rank():
 @app.route('/nrank', methods=['GET', 'POST'])
 def ori_rank():
 	if request.method == 'GET':
-		if 'username' in session:
-			date = request.args.get('date', datetime.datetime.today().strftime('%Y-%m-%d'))
-			result = readStockDataFromFile(DATE_DATA_PATH + '/' + date + '.txt')
-			result.sort(key=lambda x: x.stockscore, reverse=True)
-			return render_template('n_rank.html', date=date, result=result)
-		else:
-			return redirect(url_for('index'))
+		date = request.args.get('date', datetime.datetime.today().strftime('%Y-%m-%d'))
+		result = readStockDataFromFile(DATE_DATA_PATH + '/' + date + '.txt')
+		result.sort(key=lambda x: x.stockscore, reverse=True)
+		return render_template('n_rank.html', date=date, result=result)
 	else:
 		return redirect(url_for('index'))
 
@@ -73,22 +49,11 @@ def ori_rank():
 @app.route('/detail/<id>', methods=['GET', 'POST'])
 def detail(id):
 	if request.method == 'GET':
-		if 'username' in session:
-			sn = readIDAndNameFile('id/id.txt')
-			name = sn[id]
-			# result = []
-			if name == None:
-				return redirect(url_for('rank'))
-			# stocks = readStockDataFromFile(ID_DATA_PATH + '/' + id + '.txt')
-			# results = readStockRankFromDir(RESULT_PATH)
-			# for r in results:
-			# 	if id in r:
-			# 		result.append((r[id][1], r[id][2]))
-			# if len(result)==0:
-			# 	return redirect(url_for('rank'))
-			return render_template('detail.html', id=id, name=name)
-		else:
-			return redirect(url_for('index'))
+		sn = readIDAndNameFile('id/id.txt')
+		name = sn[id]
+		if name == None:
+			return redirect(url_for('rank'))
+		return render_template('detail.html', id=id, name=name)
 	else:
 		return redirect(url_for('index'))
 
@@ -226,8 +191,9 @@ def assambleWechatXML(cmd):
 		if len(args) > 1:
 			sid = args[1]
 			result = readOneStockData(sid, datetime.datetime.today().strftime('%Y-%m-%d'))
-			print result
-			ret = "代码: %s\n名称: %s\n高级排名位于前: %.2f%%\n高级分数: %.4f\n普通排名位于前: %.2f%%\n普通分数: %.2f\n建议: %s\n价格: %.2f\n日期:%s" % result
+			t= result
+			ret = "代码: %s\n名称: %s\n高级排名位于前: %.2f%%\n高级分数: %.4f\n普通排名位于前: %.2f%%\n普通分数: %.2f\n建议: %s\n价格: %.2f\n日期:%s\n" % t
+			ret += '<a href=\"http://www.hopinglight.com/detail/' + t[0] + '\">点击进入数据页面</a>\n'
 		else:
 			ret = '无效股票代码或名称'
 	elif 'l' == cmd[0]:
@@ -242,24 +208,32 @@ def assambleWechatXML(cmd):
 				if len(result[0]) > 0:
 					ret += '高级排名:\n========\n'
 					for r0 in result[0]:
-						ret += "代码: %s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % r0
+						t = r0
+						ret += "代码: %s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % t
+						ret += '<a href=\"http://www.hopinglight.com/detail/' + t[0] + '\">点击进入数据页面</a>\n'
 						ret += '--------\n'
 				if len(result[1]) > 0:
-					cmd += '普通排名:\n========\n'
+					ret += '普通排名:\n========\n'
 					for r1 in result[1]:
-						ret += "代码: %s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % r1
+						t = r1
+						ret += "代码: %s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % t
+						ret += '<a href=\"http://www.hopinglight.com/detail/' + t[0] + '\">点击进入数据页面</a>\n'
 						ret += '--------\n'
 		else:
 			result = readTodayList(datetime.datetime.today().strftime('%Y-%m-%d'))
 			if len(result[0]) > 0:
 				ret += '高级排名:\n========\n'
 				for r0 in result[0]:
-					ret += "代码: %s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % r0
+					t= r0
+					ret += "代码: %s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % t
+					ret += '<a href=\"http://www.hopinglight.com/detail/' + t[0] + '\">点击进入数据页面</a>\n'
 					ret += '--------\n'
 			if len(result[1]) > 0:
 				ret += '普通排名:\n========\n'
 				for r1 in result[1]:
-					ret += "代码: %s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % r1
+					t =  r1
+					ret += "代码:%s\n名称: %s\n分数: %.2f\n价格: %.2f\n建议: %s\n日期: %s\n" % t
+					ret+='<a href=\"http://www.hopinglight.com/detail/'+t[0]+'\">点击进入数据页面</a>\n'
 					ret += '--------\n'
 	else:
 		ret = '输入l [yyyy-mm-dd]获得今天/[yyyy-mm-dd]天的股票推荐列表\n输入s <sid|sname> 获得最新<sid|sname>股票排名信息'
@@ -276,11 +250,11 @@ if __name__ == '__main__':
 	# CONFIG = readWechatConfig()
 	# app.secret_key = '8e88c0bdba3ea10c5cec4112fc7a1494'
 	# app.run(host='0.0.0.0', debug=True, threaded=True)
-	CONFIG = readWechatConfig()
-	conf = WechatConf(token=CONFIG['token'],
-					  appid=CONFIG['appid'],
-					  appsecret=CONFIG['appsecret'],
-					  encrypt_mode=CONFIG['encrypt_mode'],
-					  encoding_aes_key=CONFIG['encoding_aes_key'])
-	wechat = WechatBasic(conf=conf)
-	print assambleWechatXML('s 000001')
+	# CONFIG = readWechatConfig()
+	# conf = WechatConf(token=CONFIG['token'],
+	# 				  appid=CONFIG['appid'],
+	# 				  appsecret=CONFIG['appsecret'],
+	# 				  encrypt_mode=CONFIG['encrypt_mode'],
+	# 				  encoding_aes_key=CONFIG['encoding_aes_key'])
+	# wechat = WechatBasic(conf=conf)
+	print assambleWechatXML('l')
