@@ -2,10 +2,13 @@
 import datetime
 import hashlib
 import re
+import urllib
+import urllib2
 from xml import etree
 
 from flask import *
 from wechat_sdk import *
+from wechat_sdk.core.conf import WechatConf
 from wechat_sdk.exceptions import *
 from wechat_sdk.messages import *
 
@@ -175,6 +178,11 @@ def wechat_auth():
 					status = wechat.message.status  # 对应于 XML 中的 Status
 				elif wechat.message.type in ['scancode_push', 'scancode_waitmsg', 'pic_sysphoto', 'pic_photo_or_album', 'pic_weixin', 'location_select']:  # 其他事件
 					key = wechat.message.key  # 对应于 XML 中的 EventKey
+			elif isinstance(wechat.message,ImageMessage):
+				url=wechat.message.picurl
+				filename= url.split('/')[-2][-1:]+'_'+url.split('/')[-1]
+				urllib.urlretrieve(url,'pic/'+filename+'.jpg')
+				xml=wechat.response_none()
 			else:
 				xml = wechat.response_text(content='暂时不接受其他类型的消息')
 			response = make_response(xml)

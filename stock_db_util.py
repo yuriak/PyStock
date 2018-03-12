@@ -85,7 +85,7 @@ def getStockByDate(date, host='localhost', user='root', passwd='', db='stockdb',
 
 # if __name__ == '__main__':
 # 	reload(sys)
-# 	exec "sys.setdefaultencoding('utf-8')"
+	exec "sys.setdefaultencoding('utf-8')"
 	# stocks = getStockByDate('2016-07-29', host='115.29.143.181', user='root', passwd='wmh67392982', db='stockdb',
 	# 						port=3306)
 	# writeStocksToFile('data_date/2016-07-29.txt',stocks)
